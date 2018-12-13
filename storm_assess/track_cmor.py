@@ -203,7 +203,7 @@ def load_cmor(fh):
 
                 # read the time variable and convert to a more useful format
                 time_var = nc.variables['time']
-                dtime = netCDF4.num2date(time_var[:],time_var.units)
+                dtime = netCDF4.num2date(time_var[:],time_var.units, calendar = time_var.calendar)
 
                 first_pts = nc.variables['FIRST_PT']
                 storm_lengths = nc.variables['NUM_PTS']
