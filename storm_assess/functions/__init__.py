@@ -5,7 +5,7 @@ tropical storms.
 
 """
 import numpy
-import datetime
+import datetime, cftime
 import calendar
 
 import matplotlib.pyplot as plt
@@ -71,7 +71,7 @@ NUM_TO_MONTH = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
                 7: 'Jul', 8: 'Aug', 9: 'Sep',10: 'Oct',11: 'Nov',12: 'Dec'}
 
 
-def _get_time_range(year, months):
+def _get_time_range(year, months, calendar = 'proleptic_gregorian'):
     """ 
     Creates a start and end date (a datetime.date timestamp) for a 
     given year and a list of months. If the list of months overlaps into 
@@ -79,20 +79,42 @@ def _get_time_range(year, months):
     adds 1 to the original year 
     
     """
-    start_date = datetime.datetime(year, months[0], 1)
+    #start_date = datetime.datetime(year, months[0], 1)
+    #print 'get_time_range ',start_date
+    start_date = cftime.datetime(year, months[0], 1)
+    cdftime = cftime.utime('hours since 1950-01-01 00:00:00', calendar = calendar)
+    t = cdftime.date2num(start_date)
+    t1 = cdftime.num2date(t)
+    
     end_year = year
     end_month = months[-1]+1
     if months[-1]+1 < months[0] or months[-1]+1 == 13 or len(months) >= 12:
         end_year = year+1
     if months[-1]+1 == 13:
         end_month = 1
-    end_date = datetime.datetime(end_year, end_month, 1)
-    return start_date, end_date
+    #end_date = datetime.datetime(end_year, end_month, 1)
+    end_date = cftime.datetime(end_year, end_month, 1)
+    t = cdftime.date2num(end_date)
+    t2 = cdftime.num2date(t)
+    return t1, t2
                 
         
 def _storms_in_time_range(storms, year, months):
     """Returns a generator of storms that formed during the desired time period """
-    start_date, end_date = _get_time_range(year, months)
+    for storm in storms[:1]:
+        # derive the calendar from the storm object, and then pass this to ensure that the start/end period has the same calendar for comparison
+        cal_type = str(type(storm.genesis_date()))
+        cal = cal_type.split('.')[-1][8:]
+        if '360' in cal:
+            calendar = '360_day'
+        elif '365' in cal:
+            calendar = '365_day'
+        elif 'noleap' in cal or 'NoLeap' in cal:
+            calendar = 'noleap'
+        else:
+            calendar = 'proleptic_gregorian'
+
+    start_date, end_date = _get_time_range(year, months, calendar = calendar)
     for storm in storms:        
         #print start_date, end_date, storm.genesis_date()
         if (storm.genesis_date() >= start_date) and (storm.genesis_date() < end_date):

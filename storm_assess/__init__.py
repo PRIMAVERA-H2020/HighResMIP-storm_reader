@@ -97,31 +97,31 @@ def _storms_in_year_member_forecast(storms, years, members, fcst_dates):
             yield storm
              
              
-def _get_time_range(year, months):
-    """ 
-    Creates a start and end date (a datetime.date timestamp) for a 
-    given year and a list of months. If the list of months overlaps into 
-    the following year (for example [11,12,1,2,3,4]) then the end date 
-    adds 1 to the original year 
-    
-    """
-    start_date = datetime.datetime(year, months[0], 1)
-    end_year = year
-    end_month = months[-1]+1
-    if months[-1]+1 < months[0] or months[-1]+1 == 13 or len(months) >= 12:
-        end_year = year+1
-    if months[-1]+1 == 13:
-        end_month = 1
-    end_date = datetime.datetime(end_year, end_month, 1)
-    return start_date, end_date
-                
+#def _get_time_range(year, months):
+#    """ 
+#    Creates a start and end date (a datetime.date timestamp) for a 
+#    given year and a list of months. If the list of months overlaps into 
+#    the following year (for example [11,12,1,2,3,4]) then the end date 
+#    adds 1 to the original year 
+#    
+#    """
+#    start_date = datetime.datetime(year, months[0], 1)
+#    end_year = year
+#    end_month = months[-1]+1
+#    if months[-1]+1 < months[0] or months[-1]+1 == 13 or len(months) >= 12:
+#        end_year = year+1
+#    if months[-1]+1 == 13:
+#        end_month = 1
+#    end_date = datetime.datetime(end_year, end_month, 1)
+#    return start_date, end_date
+#                
         
-def _storms_in_time_range(storms, year, months):
-    """Returns a generator of storms that formed during the desired time period """
-    start_date, end_date = _get_time_range(year, months)
-    for storm in storms:        
-        if (storm.genesis_date() >= start_date) and (storm.genesis_date() < end_date):
-            yield storm
+#def _storms_in_time_range(storms, year, months):
+#    """Returns a generator of storms that formed during the desired time period """
+#    start_date, end_date = _get_time_range(year, months)
+#    for storm in storms:        
+#        if (storm.genesis_date() >= start_date) and (storm.genesis_date() < end_date):
+#            yield storm
             
             
 def _storms_in_basin_year_month_member_forecast(storms, basin, year, months, members, fcst_dates):

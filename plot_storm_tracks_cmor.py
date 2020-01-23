@@ -14,7 +14,7 @@ import os, sys, glob
 import storm_assess
 import storm_assess.functions
 import storm_assess.track_cmor as track_cmor
-import netcdftime, netCDF4
+import netCDF4, cftime
 import numpy as np
 
 # some example inputs for the plotting
@@ -26,20 +26,26 @@ months_sh = [10,11,12,1,2,3,4,5]
 # plot all basin storms
 basin = None
 
+experiment = 'highresSST-present'
+YEARSTART = '1950'
+YEAREND = '2014'
+algorithm = 'TRACK'
+    
 institute = 'CMCC'
 model = 'CMCC-CM2'
 resol = 'HR4'
 model_grid = 'gn'
 member_id = 'r1i1p1f1'
-experiment = 'highresSST-present'
-YEARSTART = '1950'
-YEAREND = '2014'
-    
-algorithm = 'TRACK'
+
+institute = 'ECMWF'
+model = 'ECMWF-IFS'
+resol = 'LR'
+model_grid = 'gr'
+member_id = 'r1i1p1f1'
 
 # directory containing the storm track files
-base_dir = '/group_workspaces/jasmin2/primavera1/model_derived_data/storm_tracking/'
-CMOR_DIR = os.path.join(base_dir, algorithm, institute, model+'-'+resol, experiment, member_id, 'tropical', 'v3')
+base_dir = '/gws/nopw/j04/primavera1/model_derived_data/storm_tracking/'
+CMOR_DIR = os.path.join(base_dir, algorithm, institute, model+'-'+resol, experiment, member_id, 'tropical', 'v4')
 
 def storm_tracks(storms, years, months, basin, title, fig, ax, algorithm, hemi, genesis=False, lysis=False, max_intensity=False, warmcore = False, yoff=0.):
     """ 
@@ -121,20 +127,29 @@ def read_storms(dir_in, hemi, run, yearstart, yearend):
     Read the storms from the files
     '''
 
-    fname_nc = 'TC-{}_{}_{}-{}_{}_{}_{}_{}0101-{}1231.nc4'
+    fname_nc = 'TC-{}_{}_{}-{}_{}_{}_{}_{}0101-{}1231.nc*'
    
-    fname_nh = fname_nc.format('NH', run['algorithm'], run['model'], run['resol'], experiment, member_id, run['grid'], yearstart, yearend)
-    fname_sh = fname_nc.format('SH', run['algorithm'], run['model'], run['resol'], experiment, member_id, run['grid'], yearstart, yearend)
+    search_nh = fname_nc.format('NH', run['algorithm'], run['model'], run['resol'], experiment, member_id, run['grid'], yearstart, yearend)
+    fname_nh = glob.glob(os.path.join(dir_in, search_nh))
+    search_sh = fname_nc.format('SH', run['algorithm'], run['model'], run['resol'], experiment, member_id, run['grid'], yearstart, yearend)
+    fname_sh = glob.glob(os.path.join(dir_in, search_sh))
 
     if hemi == 'nh':
         months = months_nh
-        fname = fname_nh
+        if len(fname_nh) > 0:
+            fname = fname_nh[0]
+        else:
+            raise Exception('NH filename not found '+search_nh)
     else:
         months= months_sh
-        fname = fname_sh
+        if len(fname_sh) > 0:
+            fname = fname_sh[0]
+        else:
+            raise Exception('NH filename not found '+search_sh)
 
     # derive path to data and read the netcdf file
-    path = os.path.join(dir_in, fname)
+    #path = os.path.join(dir_in, fname)
+    path = fname
     print 'path ',path
     storms = list(track_cmor.load_cmor(path))
     print 'no storms ',len(storms)
@@ -164,6 +179,10 @@ def work(runid_info, data_dir, yearstart, yearend):
     yoff = 0
     for hemi in ['nh', 'sh']:
         storms, feature_variable, track_extra = read_storms(data_dir, hemi, runid_info, yearstart, yearend)
+
+        #for storm in storms:
+        #    print storm.genesis_date()
+
         if hemi == 'sh': yoff = 0.05
 
         title = runid_info['model']+'-'+runid_info['resol']+', '+str(yearstart)+'-'+str(yearend)
@@ -176,7 +195,7 @@ def work(runid_info, data_dir, yearstart, yearend):
     print years
     plt.show()
     
-def test():
+def test_360day():
     '''
     Set up some test data values
     The test data is in the test_data subdirectory
@@ -198,9 +217,55 @@ def test():
     # call the read and plot subroutine
     work(runid_info, dir_test, yearstart, yearend)
 
+def test_gregorian():
+    '''
+    Set up some test data values
+    The test data is in the test_data subdirectory
+    '''
+    institute = 'ECMWF'
+    model = 'ECMWF-IFS'
+    resol = 'LR'
+    model_grid = 'gr'
+    member_id = 'r1i1p1f1'
+    experiment = 'highresSST-present'
+    algorithm = 'TRACK'
+    yearstart = '1950'
+    yearend = '2014'
+    runid_info = {'model': model, 'resol': resol, 'grid': model_grid, 'algorithm': algorithm}
+
+    # the test data is in this subdirectory 
+    dir_test = os.path.join(os.getcwd(), 'test_data')
+
+    # call the read and plot subroutine
+    work(runid_info, dir_test, yearstart, yearend)
+
+def test_noleap():
+    '''
+    Set up some test data values
+    The test data is in the test_data subdirectory
+    '''
+    institute = 'CMCC'
+    model = 'CMCC-CM2'
+    resol = 'HR4'
+    model_grid = 'gn'
+    member_id = 'r1i1p1f1'
+    experiment = 'highresSST-present'
+    algorithm = 'TRACK'
+    yearstart = '2014'
+    yearend = '2014'
+    runid_info = {'model': model, 'resol': resol, 'grid': model_grid, 'algorithm': algorithm}
+
+    # the test data is in this subdirectory 
+    dir_test = os.path.join(os.getcwd(), 'test_data')
+
+    # call the read and plot subroutine
+    work(runid_info, dir_test, yearstart, yearend)
+
 if __name__ == '__main__':
 
-    test()
+    #test_360day()
+    #test_gregorian()
+    test_noleap()
 
-    runid_info = {'model': model, 'resol': resol, 'grid': model_grid, 'algorithm': algorithm}
-    work(runid_info, CMOR_DIR, YEARSTART, YEAREND)
+    #runid_info = {'model': model, 'resol': resol, 'grid': model_grid, 'algorithm': algorithm}
+    #work(runid_info, CMOR_DIR, YEARSTART, YEAREND)

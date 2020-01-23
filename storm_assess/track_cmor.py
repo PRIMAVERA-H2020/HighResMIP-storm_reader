@@ -3,13 +3,14 @@ Load function to read in Reading Universities TRACK output.
 Written for the CMORised netcdf TRACK files
 Should work for both an individual month and all months 
 
+Probably need to replace netcdftime with cftime for forwards compatibility with iris2.1
 
 """
 import os.path, sys
 import collections
 import datetime
-import netcdftime
 import netCDF4
+import cftime
 
 """ Store model storm observations as a named tuple (this enables access to data by its 
 name instead of position index) """
@@ -203,7 +204,7 @@ def load_cmor(fh):
 
                 # read the time variable and convert to a more useful format
                 time_var = nc.variables['time']
-                dtime = netCDF4.num2date(time_var[:],time_var.units, calendar = time_var.calendar)
+                dtime = cftime.num2date(time_var[:],time_var.units, calendar = time_var.calendar)
 
                 first_pts = nc.variables['FIRST_PT']
                 storm_lengths = nc.variables['NUM_PTS']
@@ -273,7 +274,7 @@ def load_cmor(fh):
 if __name__ == '__main__':
     fname = os.path.join(SAMPLE_TRACK_DATA)
     print 'Loading TRACK data from file:' , fname    
-    storms = list(load(fname, ex_cols=3, calendar='netcdftime'))
+    storms = list(load(fname, ex_cols=3, calendar='cftime'))
     print 'Number of model storms: ', len(storms)
     
     # Print storm details:
