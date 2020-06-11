@@ -206,28 +206,28 @@ def load_cmor(fh):
                 time_var = nc.variables['time']
                 dtime = cftime.num2date(time_var[:],time_var.units, calendar = time_var.calendar)
 
-                first_pts = nc.variables['FIRST_PT']
-                storm_lengths = nc.variables['NUM_PTS']
-                indices = nc.variables['index']
-                lats = nc.variables['lat']
-                lons = nc.variables['lon']
-                vorts = nc.variables[vort_variable]
-                psls = nc.variables['psl']
-                sfcWinds = nc.variables['sfcWind']
-                vmaxs = nc.variables['ws925']
+                first_pts = nc.variables['FIRST_PT'][:]
+                storm_lengths = nc.variables['NUM_PTS'][:]
+                indices = nc.variables['index'][:]
+                lats = nc.variables['lat'][:]
+                lons = nc.variables['lon'][:]
+                vorts = nc.variables[vort_variable][:]
+                psls = nc.variables['psl'][:]
+                sfcWinds = nc.variables['sfcWind'][:]
+                vmaxs = nc.variables['ws925'][:]
                 
                 # number of pressure levels for variables
                 if plev >= 5:
-                    rv850_T63 = nc.variables['rv850_T63']
-                    rv700_T63 = nc.variables['rv700_T63']
-                    rv600_T63 = nc.variables['rv600_T63']
-                    rv500_T63 = nc.variables['rv500_T63']
-                    rv250_T63 = nc.variables['rv250_T63']
+                    rv850_T63 = nc.variables['rv850_T63'][:]
+                    rv700_T63 = nc.variables['rv700_T63'][:]
+                    rv600_T63 = nc.variables['rv600_T63'][:]
+                    rv500_T63 = nc.variables['rv500_T63'][:]
+                    rv250_T63 = nc.variables['rv250_T63'][:]
                     rv_diff_850_250 = (rv850_T63[:] - rv250_T63[:])
                 elif plev < 5:
-                    rv850_T63 = nc.variables['rv850_T63']
-                    rv500_T63 = nc.variables['rv500_T63']
-                    rv250_T63 = nc.variables['rv250_T63']
+                    rv850_T63 = nc.variables['rv850_T63'][:]
+                    rv500_T63 = nc.variables['rv500_T63'][:]
+                    rv250_T63 = nc.variables['rv250_T63'][:]
                     rv_diff_850_250 = (rv850_T63[:] - rv250_T63[:])
 
                 for storm_no in range(ntracks):

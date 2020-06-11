@@ -171,7 +171,7 @@ def read_storms(dir_in, hemi, run, yearstart, yearend):
 
     return storms, feature_variable, track_extra
 
-def work(runid_info, data_dir, yearstart, yearend):
+def work(runid_info, data_dir, yearstart, yearend, yearsplot):
 
     fig = plt.figure(figsize=(9,6), dpi=100)
     ax = storm_assess.functions.load_map(basin=basin)
@@ -186,7 +186,7 @@ def work(runid_info, data_dir, yearstart, yearend):
         if hemi == 'sh': yoff = 0.05
 
         title = runid_info['model']+'-'+runid_info['resol']+', '+str(yearstart)+'-'+str(yearend)
-        storm_tracks(storms, years, months, basin, title, fig, ax, algorithm, hemi, yoff=yoff, max_intensity = False, genesis = False)
+        storm_tracks(storms, yearsplot, months, basin, title, fig, ax, algorithm, hemi, yoff=yoff, max_intensity = False, genesis = False)
 
     current_dir = os.getcwd()
     figname = os.path.join(current_dir, runid_info['model']+algorithm+'.png')
@@ -209,13 +209,14 @@ def test_360day():
     algorithm = 'TRACK'
     yearstart = '2014'
     yearend = '2014'
+    yearsplot = range(2014, 2015)
     runid_info = {'model': model, 'resol': resol, 'grid': model_grid, 'algorithm': algorithm}
 
     # the test data is in this subdirectory 
     dir_test = os.path.join(os.getcwd(), 'test_data')
 
     # call the read and plot subroutine
-    work(runid_info, dir_test, yearstart, yearend)
+    work(runid_info, dir_test, yearstart, yearend, yearsplot)
 
 def test_gregorian():
     '''
@@ -231,13 +232,14 @@ def test_gregorian():
     algorithm = 'TRACK'
     yearstart = '1950'
     yearend = '2014'
+    yearsplot = range(1980, 1981)
     runid_info = {'model': model, 'resol': resol, 'grid': model_grid, 'algorithm': algorithm}
 
     # the test data is in this subdirectory 
     dir_test = os.path.join(os.getcwd(), 'test_data')
 
     # call the read and plot subroutine
-    work(runid_info, dir_test, yearstart, yearend)
+    work(runid_info, dir_test, yearstart, yearend, yearsplot)
 
 def test_noleap():
     '''
@@ -253,19 +255,20 @@ def test_noleap():
     algorithm = 'TRACK'
     yearstart = '2014'
     yearend = '2014'
+    yearsplot = range(2014, 2015)
     runid_info = {'model': model, 'resol': resol, 'grid': model_grid, 'algorithm': algorithm}
 
     # the test data is in this subdirectory 
     dir_test = os.path.join(os.getcwd(), 'test_data')
 
     # call the read and plot subroutine
-    work(runid_info, dir_test, yearstart, yearend)
+    work(runid_info, dir_test, yearstart, yearend, yearsplot)
 
 if __name__ == '__main__':
 
     #test_360day()
-    #test_gregorian()
-    test_noleap()
+    test_gregorian()
+    #test_noleap()
 
     #runid_info = {'model': model, 'resol': resol, 'grid': model_grid, 'algorithm': algorithm}
     #work(runid_info, CMOR_DIR, YEARSTART, YEAREND)
