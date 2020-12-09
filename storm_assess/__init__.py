@@ -11,14 +11,14 @@ import scipy.signal as signal
 
 def find_local_maximum(data):
     max_peakind = signal.find_peaks_cwt(data, numpy.arange(1,100))
-    print 'max_peak ',max_peakind
-    print 'data ',data
+    print('max_peak ',max_peakind)
+    print('data ',data)
     for peak in max_peakind:
         local_max = data[peak]
-	print 'peak ',peak
-	print 'local_max ',local_max, data[max([peak-4, 0]):peak]
-	min_index = max([peak-4, 0])
-	max_index = min([peak+5,len(data)])
+        print('peak ',peak)
+        print('local_max ',local_max, data[max([peak-4, 0]):peak])
+        min_index = max([peak-4, 0])
+        max_index = min([peak+5,len(data)])
         if max(data[min_index:peak]) <= local_max and \
                    local_max >=  max(data[peak+1:max_index]):
             return peak
@@ -40,7 +40,7 @@ def _basin_polygon(basin, project=True):
                        'mdr': ([-60, -20, -20, -60, -60], [10, 10, 20, 20, 10])
                        }
     
-    rbox = sgeom.Polygon(zip(*TRACKING_REGION.get(basin)))
+    rbox = sgeom.Polygon(list(zip(*TRACKING_REGION.get(basin))))
     if project: 
         rbox = ccrs.PlateCarree().project_geometry(rbox, ccrs.PlateCarree())
     return rbox
@@ -49,8 +49,8 @@ def _basin_polygon(basin, project=True):
 def _storm_in_basin(storm, basin):
     """ Returns True if a storm track intersects a defined ocean basin """
     rbox = _basin_polygon(basin)   
-    lons, lats = zip(*[(ob.lon, ob.lat) for ob in storm.obs])
-    track = sgeom.LineString(zip(lons, lats))       
+    lons, lats = list(zip(*[(ob.lon, ob.lat) for ob in storm.obs]))
+    track = sgeom.LineString(list(zip(lons, lats)))       
     projected_track = ccrs.PlateCarree().project_geometry(track, ccrs.Geodetic())
     if rbox.intersects(projected_track):
         return True
