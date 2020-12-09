@@ -30,6 +30,7 @@ experiment = 'highresSST-present'
 YEARSTART = '1950'
 YEAREND = '2014'
 algorithm = 'TRACK'
+yearsplot = list(range(YEARSTART, YEAREND+1))
     
 institute = 'CMCC'
 model = 'CMCC-CM2'
@@ -113,13 +114,13 @@ def storm_tracks(storms, years, months, basin, title, fig, ax, algorithm, hemi, 
         fig.gca().coastlines() 
         title1 = 'Model Tropical Storm %s\n %s (%s - %s) using %s \n %s' % \
                   (variable, storm_assess.functions.BASIN_NAME.get(basin), str(years[0]), str(years[-1]), algorithm, title)
-        print title1
+        print(title1)
         ax.set_title(title1, fontsize=12)
         s = ('Total tropical storms for %s: %s' % (hemi, count))
         fig.text(0.02, 0.09-yoff, s, ha='left', va='center', transform=plt.gca().transAxes)
         #print s   
     else:
-        print 'No storms found'
+        print('No storms found')
 
 def read_storms(dir_in, hemi, run, yearstart, yearend):
     '''
@@ -150,9 +151,9 @@ def read_storms(dir_in, hemi, run, yearstart, yearend):
     # derive path to data and read the netcdf file
     #path = os.path.join(dir_in, fname)
     path = fname
-    print 'path ',path
+    print('path ',path)
     storms = list(track_cmor.load_cmor(path))
-    print 'no storms ',len(storms)
+    print('no storms ',len(storms))
 
     # check the metadata to discover which algorithm this is, and hence
     # what feature variable is tracked
@@ -192,7 +193,7 @@ def work(runid_info, data_dir, yearstart, yearend, yearsplot):
     figname = os.path.join(current_dir, runid_info['model']+algorithm+'.png')
     plt.savefig(figname)
 
-    print years
+    print(years)
     plt.show()
     
 def test_360day():
@@ -209,7 +210,7 @@ def test_360day():
     algorithm = 'TRACK'
     yearstart = '2014'
     yearend = '2014'
-    yearsplot = range(2014, 2015)
+    yearsplot = list(range(2014, 2015))
     runid_info = {'model': model, 'resol': resol, 'grid': model_grid, 'algorithm': algorithm}
 
     # the test data is in this subdirectory 
@@ -232,7 +233,7 @@ def test_gregorian():
     algorithm = 'TRACK'
     yearstart = '1950'
     yearend = '2014'
-    yearsplot = range(1980, 1981)
+    yearsplot = list(range(1980, 1981))
     runid_info = {'model': model, 'resol': resol, 'grid': model_grid, 'algorithm': algorithm}
 
     # the test data is in this subdirectory 
@@ -255,7 +256,7 @@ def test_noleap():
     algorithm = 'TRACK'
     yearstart = '2014'
     yearend = '2014'
-    yearsplot = range(2014, 2015)
+    yearsplot = list(range(2014, 2015))
     runid_info = {'model': model, 'resol': resol, 'grid': model_grid, 'algorithm': algorithm}
 
     # the test data is in this subdirectory 

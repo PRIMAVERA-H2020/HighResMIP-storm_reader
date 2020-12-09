@@ -171,7 +171,7 @@ def load_cmor(fh):
     # date, lat, long, vort, vmax, mslp, T63[nlev], vmax_kts, w10m
 
     scaling_ms_knots = 1.944
-    print 'fh type', type(fh)
+    print('fh type', type(fh))
     fh_type = str(type(fh))
     if 'str' in fh_type:
         fh = [fh]
@@ -181,7 +181,7 @@ def load_cmor(fh):
         if not os.path.exists(fname):
             raise Exception('Input file does not exist '+fname)
         else:
-            print 'fname ',fname
+            print('fname ',fname)
             with netCDF4.Dataset(fname, 'r') as nc:
                 track_algorithm = nc.getncattr('algorithm')
                 if track_algorithm == 'TRACK':
@@ -194,7 +194,10 @@ def load_cmor(fh):
 
                 # number of storms in the file
                 ntracks = int(nc.dimensions['tracks'].size)
-                plev = int(nc.dimensions['plev'].size)
+                try:
+                    plev = int(nc.dimensions['plev'].size)
+                except:
+                    plev = 1
         # Loop through each storm, and create a class object containing the storm properties
                 psl = nc.variables['psl']
                 if psl.units == 'Pa':
@@ -273,14 +276,14 @@ def load_cmor(fh):
 
 if __name__ == '__main__':
     fname = os.path.join(SAMPLE_TRACK_DATA)
-    print 'Loading TRACK data from file:' , fname    
+    print('Loading TRACK data from file:' , fname)    
     storms = list(load(fname, ex_cols=3, calendar='cftime'))
-    print 'Number of model storms: ', len(storms)
+    print('Number of model storms: ', len(storms))
     
     # Print storm details:
     for storm in storms: 
         #print storm.snbr, storm.genesis_date()
         for ob in storm.obs:
-            print ob.date, ob.lon, ob.lat, ob.vmax, ob.extras['vmax_kts'], ob.mslp, ob.vort
-    print 'Number of model storms: ', len(storms)
+            print(ob.date, ob.lon, ob.lat, ob.vmax, ob.extras['vmax_kts'], ob.mslp, ob.vort)
+    print('Number of model storms: ', len(storms))
     

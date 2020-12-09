@@ -141,7 +141,7 @@ def _basin_polygon(basin, project=True):
     through the area defined by -270 to -200W, 0 to -40S.
     
     """
-    rbox = sgeom.Polygon(zip(*TRACKING_REGION.get(basin)))
+    rbox = sgeom.Polygon(list(zip(*TRACKING_REGION.get(basin))))
     if project: 
         rbox = ccrs.PlateCarree().project_geometry(rbox, ccrs.PlateCarree())
     return rbox
@@ -150,15 +150,15 @@ def _basin_polygon(basin, project=True):
 def _storm_in_basin(storm, basin):
     """ Returns True if a storm track intersects a defined ocean basin """
     rbox = _basin_polygon(basin)   
-    lons, lats = zip(*[(ob.lon, ob.lat) for ob in storm.obs])
+    lons, lats = list(zip(*[(ob.lon, ob.lat) for ob in storm.obs]))
     try:
-        track = sgeom.LineString(zip(lons, lats))       
+        track = sgeom.LineString(list(zip(lons, lats)))       
         projected_track = ccrs.PlateCarree().project_geometry(track, ccrs.Geodetic())
         if rbox.intersects(projected_track):
             return True
         return False
     except:
-        print 'failed storm in basin, ',lons, lats
+        print('failed storm in basin, ',lons, lats)
         return False
 
 def _storm_genesis_in_basin(storm, basin):
@@ -295,7 +295,7 @@ def storm_lats_lons(storms, years, months, basin, genesis=False,
 
 def get_projected_track(storm, map_proj):
     """ Returns track of storm as a linestring """
-    lons, lats = zip(*[(ob.lon, ob.lat) for ob in storm.obs])
-    track = sgeom.LineString(zip(lons, lats))
+    lons, lats = list(zip(*[(ob.lon, ob.lat) for ob in storm.obs]))
+    track = sgeom.LineString(list(zip(lons, lats)))
     projected_track = map_proj.project_geometry(track, ccrs.Geodetic())
     return projected_track
