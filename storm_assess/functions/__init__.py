@@ -101,6 +101,7 @@ def _get_time_range(year, months, calendar = 'proleptic_gregorian'):
         
 def _storms_in_time_range(storms, year, months):
     """Returns a generator of storms that formed during the desired time period """
+    calendar = 'proleptic_gregorian'
     for storm in storms[:1]:
         # derive the calendar from the storm object, and then pass this to ensure that the start/end period has the same calendar for comparison
         cal_type = str(type(storm.genesis_date()))
@@ -115,6 +116,7 @@ def _storms_in_time_range(storms, year, months):
             calendar = 'proleptic_gregorian'
 
     start_date, end_date = _get_time_range(year, months, calendar = calendar)
+
     for storm in storms:        
         #print start_date, end_date, storm.genesis_date()
         if (storm.genesis_date() >= start_date) and (storm.genesis_date() < end_date):
@@ -299,3 +301,126 @@ def get_projected_track(storm, map_proj):
     track = sgeom.LineString(list(zip(lons, lats)))
     projected_track = map_proj.project_geometry(track, ccrs.Geodetic())
     return projected_track
+
+def _get_annual_vmax_storm_count_hemi(storms, years, months, basin):
+    """ 
+    Returns array of storm counts for each year for a given set of months 
+    and storm types. Default storm type is to count all tropical cyclones 
+    (1 min winds > 33 kts) 
+    
+    """
+    storm_counts = []
+    count = 0
+#    print years, months
+    for storm in ts_model.example_code._storms_in_time_range(storms, years[0], months):
+#        print 'found storm'
+        if _storm_vmax_in_basin(storm, basin):
+            count += 1
+    storm_counts.append(count)
+    return storm_counts    
+
+def _get_annual_vmax_storm_ace_hemi(storms, years, months, basin):
+    """ 
+    Returns array of storm counts for each year for a given set of months 
+    and storm types. Default storm type is to count all tropical cyclones 
+    (1 min winds > 33 kts) 
+    
+    """
+    storm_ace = []
+    ace = 0
+#    print years, months
+    for storm in ts_model.example_code._storms_in_time_range(storms, years[0], months):
+        #print 'found storm in ace, anywhere ', storm.ace_index()
+        if _storm_vmax_in_basin(storm, basin):
+            ace += storm.ace_index_no6hrcheck()
+    storm_ace.append(ace)
+    return storm_ace   
+
+def get_annual_vmax_mean_ace(storms, years, months, basin, nensemble):
+    """ 
+    Returns list of annual mean ace for a given
+    set of years and months 
+    """
+    mean_annual_ace = []
+    for year in years:
+        annual_ace = _get_annual_vmax_storm_ace_hemi(storms, [year,year], months, basin)
+#        print 'year, annual ace ',annual_ace
+        for ace in annual_ace:
+            mean_annual_ace.append(float(ace)/float(nensemble))
+    return mean_annual_ace
+
+def annual_vmax_storm_counts(storms, years, months, basin, storm_types=['SS', 'TS', 'HU', 'MH']):
+    """ 
+    Returns array of storm counts for each year for a given set of months 
+    and storm types. Default storm type is to count all tropical cyclones 
+    (1 min winds > 33 kts) 
+    
+    """
+    storm_counts = []
+    for year in years:
+        count = 0
+        for storm in ts_model.example_code._storms_in_time_range(storms, year, months):
+            if (storm.max_storm_type() in storm_types) and _storm_vmax_in_basin(storm, basin):
+                count += 1
+        storm_counts.append(count)
+    return storm_counts    
+
+def annual_vmax_storm_ace(storms, years, months, basin, storm_types=['SS', 'TS', 'HU', 'MH']):
+    """ 
+    Returns array of storm counts for each year for a given set of months 
+    and storm types. Default storm type is to count all tropical cyclones 
+    (1 min winds > 33 kts) 
+    
+    """
+    storm_ace = []
+    for year in years:
+        ace = 0
+        for storm in ts_model.example_code._storms_in_time_range(storms, year, months):
+            if (storm.max_storm_type() in storm_types) and _storm_vmax_in_basin(storm, basin):
+                ace += storm.ace_index()
+        storm_ace.append(ace)
+    return storm_ace  
+
+def storm_intensity(mslp):
+    """ 
+    Returns hurricane category based on Saffir-Simpson Hurricane 
+    Wind Scale. Non-hurricanes return '--' 
+    
+    """
+#    print 'mslp',mslp
+    if (float(mslp) >= 994.):
+        category=0 # Category 1
+    elif (float(mslp) >= 980. and float(mslp) < 994.):
+        category=1 # Category 2
+    elif (float(mslp) >= 965. and float(mslp) < 980.):
+        category=2 # Category 3  
+    elif (float(mslp) >= 945. and float(mslp) < 965.):
+        category=3 # Category 4       
+    elif (float(mslp) >= 920. and float(mslp) < 945.):
+        category=4 # Category 4       
+    elif (float(mslp) >= 860. and float(mslp) < 920):
+        category=5 # Category 5                   
+    else:
+        category=0
+    return category
+    
+def storm_intensity_vmax(vmax):
+    """ 
+    Returns hurricane category based on Saffir-Simpson Hurricane 
+    Wind Scale. Non-hurricanes return '--' 
+    
+    """
+    if vmax >= 64 and vmax <= 82:
+        category=1 # Category 1
+    elif vmax >= 83 and vmax <= 95:
+        category=2 # Category 2
+    elif vmax >= 96 and vmax <= 112:
+        category=3 # Category 3  
+    elif vmax >= 113 and vmax <= 136:
+        category=4 # Category 4       
+    elif vmax >= 137:
+        category=5 # Category 5                   
+    else:
+        category=0
+    return category
+
