@@ -329,6 +329,39 @@ def get_projected_track(storm, map_proj):
     projected_track = map_proj.project_geometry(track, ccrs.Geodetic())
     return projected_track
 
+def _get_annual_vmax_storm_count_category(storms, years, months, basin):
+    """ 
+    Returns array of storm counts for each year for a given set of months 
+    and storm types. Default storm type is to count all tropical cyclones 
+    (1 min winds > 33 kts) 
+    
+    """
+    storm_counts = np.zeros(6)
+    count = np.zeros(6)
+    for storm in ts_model.example_code._storms_in_time_range(storms, years[0], months):
+        if _storm_vmax_in_basin(storm, basin):
+            category = storm_intensity(storm.obs_at_vmax().mslp)
+            count[category] += 1
+        storm_counts=count
+    return storm_counts    
+
+def _get_annual_vmax_storm_ace_category(storms, years, months, basin):
+    """ 
+    Returns array of storm ACE for each year for a given set of months 
+    and storm types. Default storm type is to count all tropical cyclones 
+    (1 min winds > 33 kts) 
+    
+    """
+    storm_counts = np.zeros(6); storm_ace = np.zeros(6)
+    count = np.zeros(6); ace = np.zeros(6)
+    for storm in ts_model.example_code._storms_in_time_range(storms, years[0], months):
+        if _storm_vmax_in_basin(storm, basin):
+            category = storm_intensity(storm.obs_at_vmax().mslp)
+            count[category] += 1
+            ace[category] += storm.ace_index_no6hrcheck()
+        storm_ace=ace
+    return storm_ace   
+
 def get_annual_vmax_mean_count_category(storms, years, months, basin, nensemble):
     """ 
     Returns list of annual mean storm counts for a given
