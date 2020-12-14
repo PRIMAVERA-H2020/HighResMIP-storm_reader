@@ -336,6 +336,20 @@ def _get_annual_vmax_storm_ace_hemi(storms, years, months, basin):
     storm_ace.append(ace)
     return storm_ace   
 
+def get_annual_vmax_mean_count(storms, years, months, basin, nensemble):
+    """ 
+    Returns list of annual mean storm counts for a given
+    set of years and months 
+    
+    
+    """
+    mean_annual_count = []
+    for year in years:
+        annual_count = _get_annual_vmax_storm_count_hemi(storms, [year,year], months, basin)
+        for count in annual_count:
+            mean_annual_count.append(float(count)/float(nensemble))
+    return mean_annual_count
+
 def get_annual_vmax_mean_ace(storms, years, months, basin, nensemble):
     """ 
     Returns list of annual mean ace for a given
