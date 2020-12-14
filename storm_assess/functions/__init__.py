@@ -312,7 +312,7 @@ def _get_annual_vmax_storm_count_hemi(storms, years, months, basin):
     storm_counts = []
     count = 0
 #    print years, months
-    for storm in ts_model.example_code._storms_in_time_range(storms, years[0], months):
+    for storm in _storms_in_time_range(storms, years[0], months):
 #        print 'found storm'
         if _storm_vmax_in_basin(storm, basin):
             count += 1
@@ -329,7 +329,7 @@ def _get_annual_vmax_storm_ace_hemi(storms, years, months, basin):
     storm_ace = []
     ace = 0
 #    print years, months
-    for storm in ts_model.example_code._storms_in_time_range(storms, years[0], months):
+    for storm in _storms_in_time_range(storms, years[0], months):
         #print 'found storm in ace, anywhere ', storm.ace_index()
         if _storm_vmax_in_basin(storm, basin):
             ace += storm.ace_index_no6hrcheck()
@@ -373,7 +373,7 @@ def annual_vmax_storm_counts(storms, years, months, basin, storm_types=['SS', 'T
     storm_counts = []
     for year in years:
         count = 0
-        for storm in ts_model.example_code._storms_in_time_range(storms, year, months):
+        for storm in _storms_in_time_range(storms, year, months):
             if (storm.max_storm_type() in storm_types) and _storm_vmax_in_basin(storm, basin):
                 count += 1
         storm_counts.append(count)
@@ -389,7 +389,7 @@ def annual_vmax_storm_ace(storms, years, months, basin, storm_types=['SS', 'TS',
     storm_ace = []
     for year in years:
         ace = 0
-        for storm in ts_model.example_code._storms_in_time_range(storms, year, months):
+        for storm in _storms_in_time_range(storms, year, months):
             if (storm.max_storm_type() in storm_types) and _storm_vmax_in_basin(storm, basin):
                 ace += storm.ace_index()
         storm_ace.append(ace)
