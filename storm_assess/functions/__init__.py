@@ -132,8 +132,8 @@ def _storms_in_time_range(storms, year, months):
     for storm in storms[:1]:
         # derive the calendar from the storm object, and then pass this to ensure that the start/end period has the same calendar for comparison
         cal_type = str(type(storm.genesis_date()))
-        cal = cal_type.split('.')[-1][8:]
-        print ('calendar ',cal)
+        cal = cal_type.split('.')[-1][8:-2]
+        print ('calendar ',cal_type, cal)
         if '360' in cal:
             calendar = '360_day'
         elif '365' in cal:
