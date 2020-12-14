@@ -338,7 +338,7 @@ def _get_annual_vmax_storm_count_category(storms, years, months, basin):
     """
     storm_counts = np.zeros(6)
     count = np.zeros(6)
-    for storm in ts_model.example_code._storms_in_time_range(storms, years[0], months):
+    for storm in _storms_in_time_range(storms, years[0], months):
         if _storm_vmax_in_basin(storm, basin):
             category = storm_intensity(storm.obs_at_vmax().mslp)
             count[category] += 1
@@ -354,7 +354,7 @@ def _get_annual_vmax_storm_ace_category(storms, years, months, basin):
     """
     storm_counts = np.zeros(6); storm_ace = np.zeros(6)
     count = np.zeros(6); ace = np.zeros(6)
-    for storm in ts_model.example_code._storms_in_time_range(storms, years[0], months):
+    for storm in _storms_in_time_range(storms, years[0], months):
         if _storm_vmax_in_basin(storm, basin):
             category = storm_intensity(storm.obs_at_vmax().mslp)
             count[category] += 1
@@ -405,7 +405,7 @@ def annual_vmax_storm_counts_category(storms, years, months, basin, storm_types=
     annual_category = np.zeros(len(years)*6).reshape(len(years),6)
     for iyr, year in enumerate(years):
         count = 0
-        for storm in ts_model.example_code._storms_in_time_range(storms, year, months):
+        for storm in _storms_in_time_range(storms, year, months):
             if (storm.max_storm_type() in storm_types) and _storm_vmax_in_basin(storm, basin):
 #                category = storm_intensity(storm.obs_at_vmax().mslp)
 #                category2 = storm_intensity_vmax(storm.obs_at_vmax().vmax)
@@ -425,7 +425,7 @@ def annual_vmax_storm_ace_category(storms, years, months, basin, storm_types=['S
     annual_category = np.zeros(len(years)*6).reshape(len(years),6)
     for iyr, year in enumerate(years):
         count = 0
-        for storm in ts_model.example_code._storms_in_time_range(storms, year, months):
+        for storm in _storms_in_time_range(storms, year, months):
             if (storm.max_storm_type() in storm_types) and _storm_vmax_in_basin(storm, basin):
                 category = storm_intensity(storm.obs_at_vmax().mslp)
                 category2 = storm_intensity_vmax(storm.obs_at_vmax().vmax)
