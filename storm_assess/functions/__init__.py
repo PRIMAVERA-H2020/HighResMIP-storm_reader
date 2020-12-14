@@ -71,6 +71,32 @@ NUM_TO_MONTH = {1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
                 7: 'Jul', 8: 'Aug', 9: 'Sep',10: 'Oct',11: 'Nov',12: 'Dec'}
 
 
+def _storm_vmax_in_basin(storm, basin):
+    """ Returns True if the maximum intensity of the storm occurred
+    in desired ocean basin. """
+    rbox = _basin_polygon(basin)  
+    if 'obs_at_vmax' in dir(storm):
+        xy = ccrs.PlateCarree().transform_point(storm.obs_at_vmax().lon, storm.obs_at_vmax().lat, ccrs.Geodetic())
+    else:
+        xy = ccrs.PlateCarree().transform_point(storm.obs_at_vmax().lon, storm.obs_at_vmax().lat, ccrs.Geodetic())
+    point = sgeom.Point(xy[0], xy[1])
+    if point.within(rbox):
+        return True
+    return False
+
+def _storm_genesis_in_basin(storm, basin):
+    """ Returns True if the maximum intensity of the storm occurred
+    in desired ocean basin. """
+    rbox = _basin_polygon(basin)  
+    if 'obs_at_genesis' in dir(storm):
+        xy = ccrs.PlateCarree().transform_point(storm.obs_at_genesis().lon, storm.obs_at_genesis().lat, ccrs.Geodetic())
+    else:
+        xy = ccrs.PlateCarree().transform_point(storm.obs_at_genesis().lon, storm.obs_at_genesis().lat, ccrs.Geodetic())
+    point = sgeom.Point(xy[0], xy[1])
+    if point.within(rbox):
+        return True
+    return False
+
 def _get_time_range(year, months, calendar = 'proleptic_gregorian'):
     """ 
     Creates a start and end date (a datetime.date timestamp) for a 
