@@ -133,12 +133,15 @@ def _storms_in_time_range(storms, year, months):
         # derive the calendar from the storm object, and then pass this to ensure that the start/end period has the same calendar for comparison
         cal_type = str(type(storm.genesis_date()))
         cal = cal_type.split('.')[-1][8:]
+        print ('calendar ',cal)
         if '360' in cal:
             calendar = '360_day'
         elif '365' in cal:
             calendar = '365_day'
         elif 'noleap' in cal or 'NoLeap' in cal:
             calendar = 'noleap'
+        elif cal == 'Gregorian':
+            calendar = 'gregorian'
         else:
             calendar = 'proleptic_gregorian'
 
