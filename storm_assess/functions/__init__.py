@@ -101,6 +101,7 @@ def _get_time_range(year, months, calendar = 'proleptic_gregorian'):
         
 def _storms_in_time_range(storms, year, months):
     """Returns a generator of storms that formed during the desired time period """
+    calendar = 'proleptic_gregorian'
     for storm in storms[:1]:
         # derive the calendar from the storm object, and then pass this to ensure that the start/end period has the same calendar for comparison
         cal_type = str(type(storm.genesis_date()))
@@ -115,6 +116,7 @@ def _storms_in_time_range(storms, year, months):
             calendar = 'proleptic_gregorian'
 
     start_date, end_date = _get_time_range(year, months, calendar = calendar)
+
     for storm in storms:        
         #print start_date, end_date, storm.genesis_date()
         if (storm.genesis_date() >= start_date) and (storm.genesis_date() < end_date):
@@ -299,3 +301,38 @@ def get_projected_track(storm, map_proj):
     track = sgeom.LineString(list(zip(lons, lats)))
     projected_track = map_proj.project_geometry(track, ccrs.Geodetic())
     return projected_track
+
+def _get_annual_vmax_storm_count_hemi(storms, years, months, basin):
+    """ 
+    Returns array of storm counts for each year for a given set of months 
+    and storm types. Default storm type is to count all tropical cyclones 
+    (1 min winds > 33 kts) 
+    
+    """
+    storm_counts = []
+    count = 0
+#    print years, months
+    for storm in ts_model.example_code._storms_in_time_range(storms, years[0], months):
+#        print 'found storm'
+        if _storm_vmax_in_basin(storm, basin):
+            count += 1
+    storm_counts.append(count)
+    return storm_counts    
+
+def _get_annual_vmax_storm_ace_hemi(storms, years, months, basin):
+    """ 
+    Returns array of storm counts for each year for a given set of months 
+    and storm types. Default storm type is to count all tropical cyclones 
+    (1 min winds > 33 kts) 
+    
+    """
+    storm_ace = []
+    ace = 0
+#    print years, months
+    for storm in ts_model.example_code._storms_in_time_range(storms, years[0], months):
+        #print 'found storm in ace, anywhere ', storm.ace_index()
+        if _storm_vmax_in_basin(storm, basin):
+            ace += storm.ace_index_no6hrcheck()
+    storm_ace.append(ace)
+    return storm_ace   
+

@@ -11,6 +11,7 @@ import collections
 import datetime
 import netCDF4
 import cftime
+import numpy as np
 
 """ Store model storm observations as a named tuple (this enables access to data by its 
 name instead of position index) """
@@ -149,7 +150,7 @@ class Storm(object):
         return [ob for ob in self.obs][-1]
     
 
-def load_cmor(fh):
+def load_cmor(fh, vort_variable = ''):
     '''
     Load cmor netcdf format of track files
     The input file should contain (at least):
@@ -184,22 +185,29 @@ def load_cmor(fh):
             print('fname ',fname)
             with netCDF4.Dataset(fname, 'r') as nc:
                 track_algorithm = nc.getncattr('algorithm')
-                if track_algorithm == 'TRACK':
-                    if nc.getncattr('algorithm_extra') == 'T63avg':
-                        vort_variable = 'vortmean_T63'
-                    else:
-                        vort_variable = 'rv850_T42'
-                elif track_algorithm == 'TempestExtremes':
-                    vort_variable = 'rv850'
+                if vort_variable == '':
+                    if track_algorithm == 'TRACK':
+                        if nc.getncattr('algorithm_extra') == 'T63avg':
+                            vort_variable = 'vortmean_T63'
+                        else:
+                            vort_variable = 'rv850_T42'
+                    elif track_algorithm == 'TempestExtremes':
+                        vort_variable = 'rv850'
 
                 # number of storms in the file
                 ntracks = int(nc.dimensions['tracks'].size)
                 try:
                     plev = int(nc.dimensions['plev'].size)
                 except:
-                    plev = 1
-        # Loop through each storm, and create a class object containing the storm properties
-                psl = nc.variables['psl']
+                    plev = 0
+                # Loop through each storm, and create a class object containing the storm properties
+                try:
+                    psl = nc.variables['psl']
+                    psl_var = 'psl'
+                except:
+                    psl = nc.variables['slp']
+                    psl_var = 'slp'
+
                 if psl.units == 'Pa':
                     psl_scaling = 1.0 / 1000.0
                 else:
@@ -214,10 +222,16 @@ def load_cmor(fh):
                 indices = nc.variables['index'][:]
                 lats = nc.variables['lat'][:]
                 lons = nc.variables['lon'][:]
-                vorts = nc.variables[vort_variable][:]
-                psls = nc.variables['psl'][:]
+                try:
+                    vorts = nc.variables[vort_variable][:]
+                except:
+                    vorts = np.ones(len(lons))
+                psls = nc.variables[psl_var][:]
                 sfcWinds = nc.variables['sfcWind'][:]
-                vmaxs = nc.variables['ws925'][:]
+                try:
+                    vmaxs = nc.variables['ws925'][:]
+                except:
+                    vmaxs = np.ones(len(lons))
                 
                 # number of pressure levels for variables
                 if plev >= 5:
@@ -227,11 +241,16 @@ def load_cmor(fh):
                     rv500_T63 = nc.variables['rv500_T63'][:]
                     rv250_T63 = nc.variables['rv250_T63'][:]
                     rv_diff_850_250 = (rv850_T63[:] - rv250_T63[:])
-                elif plev < 5:
+                elif plev > 0 and plev < 5:
                     rv850_T63 = nc.variables['rv850_T63'][:]
                     rv500_T63 = nc.variables['rv500_T63'][:]
                     rv250_T63 = nc.variables['rv250_T63'][:]
                     rv_diff_850_250 = (rv850_T63[:] - rv250_T63[:])
+                elif plev == 0:
+                    rv850_T63 = np.ones(len(lons))
+                    rv500_T63 = np.ones(len(lons))
+                    rv250_T63 = np.ones(len(lons))
+                    rv_diff_850_250 = np.ones(len(lons))
 
                 for storm_no in range(ntracks):
                 #for storm_no in range(2):
