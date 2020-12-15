@@ -38,7 +38,7 @@ MAP_REGION = {'na': (-105, 0, 60, 0),
 TRACKING_REGION = {'na': ([-75, -20, -20, -80, -80, -100, -100, -75, -75], [0, 0, 60, 60, 40, 40, 20, 6, 0]),
                    'ep': ([-140, -75, -75, -100, -100, -140, -140], [0, 0, 6, 20, 30, 30, 0]),
                    #'wp': ([-260, -180, -180, -260, -260], [0, 0, 60, 60, 0]),
-                   'wp': ([-260, -180, -180, -260, -260], [0, 0, 30, 30, 0]),
+                   'wp': ([-260, -180, -180, -260, -260], [0, 0, 60, 60, 0]),
                    'cp': ([-180, -140, -140, -180, -180], [0, 0, 50, 50, 0]),
                    'ni': ([-320, -260, -260, -320, -320], [0, 0, 30, 30, 0]),
                    'si': ([-330, -270, -270, -330, -330], [-40, -40, 0, 0, -40]),
@@ -133,7 +133,7 @@ def _storms_in_time_range(storms, year, months):
         # derive the calendar from the storm object, and then pass this to ensure that the start/end period has the same calendar for comparison
         cal_type = str(type(storm.genesis_date()))
         cal = cal_type.split('.')[-1][8:-2]
-        print ('calendar ',cal_type, cal)
+        #print ('calendar ',cal_type, cal)
         if '360' in cal:
             calendar = '360_day'
         elif '365' in cal:
