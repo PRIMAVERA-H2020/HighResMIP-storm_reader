@@ -209,7 +209,7 @@ def load_cmor(fh, vort_variable = ''):
                     psl_var = 'slp'
 
                 if psl.units == 'Pa':
-                    psl_scaling = 1.0 / 1000.0
+                    psl_scaling = 1.0 / 100.0
                 else:
                     psl_scaling = 1.0
 
