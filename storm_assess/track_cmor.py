@@ -200,6 +200,8 @@ def load_cmor(fh, vort_variable = ''):
                     plev = int(nc.dimensions['plev'].size)
                 except:
                     plev = 0
+
+                variables = nc.variables
                 # Loop through each storm, and create a class object containing the storm properties
                 try:
                     psl = nc.variables['psl']
@@ -226,11 +228,15 @@ def load_cmor(fh, vort_variable = ''):
                     vorts = nc.variables[vort_variable][:]
                 except:
                     vorts = np.ones(len(lons))
+
                 psls = nc.variables[psl_var][:]
                 sfcWinds = nc.variables['sfcWind'][:]
-                try:
+
+                if 'ws925' in variables:
                     vmaxs = nc.variables['ws925'][:]
-                except:
+                elif 'wind925' in variables:
+                    vmaxs = nc.variables['wind925'][:]
+                else:
                     vmaxs = np.ones(len(lons))
                 
                 # number of pressure levels for variables
